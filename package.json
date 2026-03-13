@@ -1,0 +1,21 @@
+{
+  "name": "portfolio",
+  "version": "1.0.0",
+  "description": "Humphrey Okoth Portfolio",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "portfolio",
+    "express",
+    "web"
+  ],
+  "author": "Humphrey Okoth",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.22.1"
+  }
+}
