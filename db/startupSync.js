@@ -79,9 +79,12 @@ async function syncDatabase() {
   const skipMigrations =
     process.env.SKIP_DB_MIGRATIONS === "true" || process.env.SKIP_DB_MIGRATIONS === "1";
 
-  if (!mysqlConfig || skipMigrations) {
-    if (skipMigrations) console.log("SKIP_DB_MIGRATIONS");
-    await seedFirstAdminIfEmpty();
+  if (skipMigrations) {
+    console.log("SKIP_DB_MIGRATIONS: skipping migrations and admin seed (no DB at startup).");
+    return;
+  }
+
+  if (!mysqlConfig) {
     return;
   }
 
