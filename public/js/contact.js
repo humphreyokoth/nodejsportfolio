@@ -10,12 +10,8 @@ function setStatus(message, isError) {
   statusEl.style.color = isError ? "#b42318" : "#067647";
 }
 
-function missingApiMessage() {
-  return "Set your Railway API URL in public/js/api-config.js (replace YOUR-RAILWAY), then redeploy. Otherwise requests hit this site and return 404.";
-}
-
 if (!apiBase() && statusEl) {
-  setStatus(missingApiMessage(), true);
+  setStatus(missingApiBaseUserMessage(), true);
 }
 
 if (form && btn) {
