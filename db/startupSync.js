@@ -38,8 +38,12 @@ function isConnectionError(err) {
     code === "ETIMEDOUT" ||
     code === "ECONNREFUSED" ||
     code === "ECONNRESET" ||
+    code === "PROTOCOL_CONNECTION_LOST" ||
+    code === "ECONNPIPE" ||
     msg.includes("ETIMEDOUT") ||
-    msg.includes("ECONNREFUSED")
+    msg.includes("ECONNREFUSED") ||
+    msg.includes("Connection lost") ||
+    msg.includes("server closed the connection")
   );
 }
 

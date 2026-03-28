@@ -22,6 +22,8 @@ function getPool() {
     connectionLimit: maxConnections,
     ssl: config.ssl,
     connectTimeout: connectTimeoutMs,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
   });
 
   return sharedPool;

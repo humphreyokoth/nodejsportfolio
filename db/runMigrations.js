@@ -25,6 +25,8 @@ async function ensureDatabaseExists(mysqlConfig, connectTimeoutMs) {
     ssl: mysqlConfig.ssl,
     connectTimeout: connectTimeoutMs,
     multipleStatements: false,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
   });
 
   try {
@@ -60,6 +62,8 @@ async function runMigrations(mysqlConfig) {
     ssl: mysqlConfig.ssl,
     connectTimeout: connectTimeoutMs,
     multipleStatements: true,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
   });
 
   try {
