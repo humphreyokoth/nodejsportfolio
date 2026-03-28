@@ -4,7 +4,7 @@ import {
   setAuthToken,
   clearAuthToken,
   missingApiBaseUserMessage,
-} from "./api-base.js?v=3";
+} from "./api-base.js?v=4";
 
 const form = document.getElementById("recipeForm");
 const submitBtn = document.getElementById("recipeSubmit");
@@ -190,13 +190,17 @@ function showLoggedIn(username) {
 }
 
 async function checkSession() {
-  const res = await apiFetch("/api/auth/me");
-  if (res.ok) {
-    const data = await res.json();
-    const name = data.user?.username || "";
-    showLoggedIn(name);
-    await loadRecipes();
-    return;
+  try {
+    const res = await apiFetch("/api/auth/me");
+    if (res.ok) {
+      const data = await res.json();
+      const name = data.user?.username || "";
+      showLoggedIn(name);
+      await loadRecipes();
+      return;
+    }
+  } catch {
+    /* timeout or network — treat as logged out */
   }
   showLoggedOut();
 }

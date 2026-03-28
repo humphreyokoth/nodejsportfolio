@@ -1,4 +1,4 @@
-import { apiFetch, apiBase, missingApiBaseUserMessage } from "./api-base.js?v=3";
+import { apiFetch, apiBase, missingApiBaseUserMessage } from "./api-base.js?v=4";
 
 const form = document.getElementById("contactForm");
 const btn = document.getElementById("contactSubmit");

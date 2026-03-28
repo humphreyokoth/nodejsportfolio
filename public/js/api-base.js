@@ -1,4 +1,4 @@
-import { API_BASE as CONFIG_BASE } from "./api-config.js?v=3";
+import { API_BASE as CONFIG_BASE } from "./api-config.js?v=4";
 
 const PLACEHOLDER = "YOUR-RAILWAY";
 
@@ -77,7 +77,8 @@ export async function apiFetch(path, options = {}) {
   }
 
   const fetchOpts = { credentials: "include", ...rest, headers };
-  const ms = Number(timeoutMs ?? 25000);
+  // Railway cold start / MySQL wake can exceed 25s; use 0 in options to disable timeout.
+  const ms = timeoutMs === 0 ? 0 : Number(timeoutMs ?? 120000);
   if (ms > 0 && typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
     const t = AbortSignal.timeout(ms);
     if (userSignal && typeof AbortSignal.any === "function") {
