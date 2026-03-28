@@ -2,7 +2,8 @@
  * Supports:
  * - Railway names: MYSQLHOST, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE, MYSQLPORT
  * - Underscore names: MYSQL_HOST, etc.
- * - Single URL: MYSQL_PUBLIC_URL, MYSQL_URL, or DATABASE_URL (mysql://user:pass@host:port/db)
+ * - Single URL: MYSQL_URL / DATABASE_URL first (internal on Railway), then MYSQL_PUBLIC_URL
+ *   (public proxy is for your laptop; inside Railway use mysql.railway.internal / MYSQL_URL).
  */
 
 function parseMysqlUrl(str) {
@@ -26,10 +27,11 @@ function parseMysqlUrl(str) {
   }
 }
 
+/**
+ * Railway public proxy (*.rlwy.net) often presents a chain Node does not trust →
+ * "self-signed certificate in certificate chain". Use rejectUnauthorized: false unless strict.
+ */
 function mysqlSslFromEnv(host) {
-  if (process.env.MYSQL_SSL === "true" || process.env.MYSQL_SSL === "1") {
-    return {};
-  }
   if (process.env.MYSQL_SSL === "false" || process.env.MYSQL_SSL === "0") {
     return false;
   }
@@ -37,15 +39,45 @@ function mysqlSslFromEnv(host) {
   if (h.endsWith(".internal") || h.includes(".railway.internal")) {
     return false;
   }
-  if (h.includes("rlwy.net")) {
+
+  let enable = false;
+  if (process.env.MYSQL_SSL === "true" || process.env.MYSQL_SSL === "1") {
+    enable = true;
+  } else if (h.includes("rlwy.net")) {
+    enable = true;
+  } else if (process.env.NODE_ENV === "production") {
+    enable = true;
+  }
+
+  if (!enable) {
+    return false;
+  }
+
+  const strict =
+    process.env.MYSQL_SSL_REJECT_UNAUTHORIZED === "true" ||
+    process.env.MYSQL_SSL_REJECT_UNAUTHORIZED === "1";
+
+  if (strict) {
     return {};
   }
-  return process.env.NODE_ENV === "production" ? {} : false;
+  if (h.includes("rlwy.net")) {
+    return { rejectUnauthorized: false };
+  }
+  const relaxed =
+    process.env.MYSQL_SSL_REJECT_UNAUTHORIZED === "false" ||
+    process.env.MYSQL_SSL_REJECT_UNAUTHORIZED === "0";
+  if (relaxed) {
+    return { rejectUnauthorized: false };
+  }
+  return {};
 }
 
 function getMysqlConfig() {
   const fromUrl = parseMysqlUrl(
-    process.env.MYSQL_PUBLIC_URL || process.env.MYSQL_URL || process.env.DATABASE_URL || ""
+    process.env.MYSQL_URL ||
+      process.env.DATABASE_URL ||
+      process.env.MYSQL_PUBLIC_URL ||
+      ""
   );
 
   const host =

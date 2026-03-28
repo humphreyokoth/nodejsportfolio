@@ -1,4 +1,10 @@
-import { apiFetch, apiBase, setAuthToken, clearAuthToken } from "./api-base.js";
+import {
+  apiFetch,
+  apiBase,
+  setAuthToken,
+  clearAuthToken,
+  missingApiBaseUserMessage,
+} from "./api-base.js";
 
 const form = document.getElementById("recipeForm");
 const submitBtn = document.getElementById("recipeSubmit");
@@ -14,6 +20,16 @@ const logoutBtn = document.getElementById("recipeLogoutBtn");
 const exportBtn = document.getElementById("recipeExportXlsx");
 const authGreeting = document.getElementById("recipeAuthGreeting");
 const loginStatusEl = document.getElementById("recipeLoginStatus");
+const tabLoginBtn = document.getElementById("recipeTabLogin");
+const tabSignupBtn = document.getElementById("recipeTabSignup");
+const loginSection = document.getElementById("recipeLoginSection");
+const signupSection = document.getElementById("recipeSignupSection");
+const signupForm = document.getElementById("recipeSignupForm");
+const signupUser = document.getElementById("recipeSignupUsername");
+const signupPass = document.getElementById("recipeSignupPassword");
+const signupPass2 = document.getElementById("recipeSignupPassword2");
+const signupBtn = document.getElementById("recipeSignupSubmit");
+const signupStatusEl = document.getElementById("recipeSignupStatus");
 const recipeImageInput = document.getElementById("recipeImage");
 const recipeImageUrlInput = document.getElementById("recipeImageUrl");
 const recipeClearImageWrap = document.getElementById("recipeClearImageWrap");
@@ -183,6 +199,74 @@ async function checkSession() {
     return;
   }
   showLoggedOut();
+}
+
+function setAuthTab(showSignup) {
+  if (loginSection) loginSection.hidden = !!showSignup;
+  if (signupSection) signupSection.hidden = !showSignup;
+  if (tabLoginBtn && tabSignupBtn) {
+    tabLoginBtn.classList.toggle("btn-primary", !showSignup);
+    tabLoginBtn.classList.toggle("btn-outline", !!showSignup);
+    tabSignupBtn.classList.toggle("btn-primary", !!showSignup);
+    tabSignupBtn.classList.toggle("btn-outline", !showSignup);
+    tabLoginBtn.setAttribute("aria-pressed", String(!showSignup));
+    tabSignupBtn.setAttribute("aria-pressed", String(!!showSignup));
+  }
+}
+
+if (tabLoginBtn) {
+  tabLoginBtn.addEventListener("click", () => setAuthTab(false));
+}
+if (tabSignupBtn) {
+  tabSignupBtn.addEventListener("click", () => setAuthTab(true));
+}
+
+if (signupForm && signupBtn) {
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const username = (signupUser?.value || "").trim();
+    const password = signupPass?.value || "";
+    const password2 = signupPass2?.value || "";
+    if (!username || !password) return;
+    if (password !== password2) {
+      if (signupStatusEl) {
+        signupStatusEl.textContent = "Passwords do not match.";
+        signupStatusEl.style.color = "#b42318";
+      }
+      return;
+    }
+    if (signupStatusEl) {
+      signupStatusEl.textContent = "";
+      signupStatusEl.style.color = "#b42318";
+    }
+    signupBtn.disabled = true;
+    const prev = signupBtn.textContent;
+    signupBtn.textContent = "Creating…";
+    try {
+      const res = await apiFetch("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        if (signupStatusEl) {
+          signupStatusEl.textContent =
+            typeof data.error === "string" ? data.error : "Could not create account.";
+        }
+        return;
+      }
+      if (typeof data.token === "string" && data.token) {
+        setAuthToken(data.token);
+      }
+      if (signupPass) signupPass.value = "";
+      if (signupPass2) signupPass2.value = "";
+      showLoggedIn(data.user?.username || username);
+      await loadRecipes();
+    } finally {
+      signupBtn.disabled = false;
+      signupBtn.textContent = prev || "Create account";
+    }
+  });
 }
 
 if (loginForm && loginBtn) {
@@ -405,6 +489,11 @@ if (listEl) {
       setStatus("Action failed. Try again.", true);
     }
   });
+}
+
+if (!apiBase() && loginStatusEl) {
+  loginStatusEl.textContent = missingApiBaseUserMessage();
+  loginStatusEl.style.color = "#b42318";
 }
 
 checkSession().catch(() => showLoggedOut());

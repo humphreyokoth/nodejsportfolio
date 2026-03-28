@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "migrate": "node db/migrate-cli.js"
+    "migrate": "node db/migrate-cli.js",
+    "deploy:firebase": "npx firebase deploy --only hosting",
+    "railway:api-url": "node scripts/print-railway-api-url.js"
   },
   "engines": {
     "node": ">=18"

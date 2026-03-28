@@ -1,15 +1,31 @@
-const AUTH_TOKEN_KEY = "portfolio_jwt";
+import { API_BASE as CONFIG_BASE } from "./api-config.js";
+
+const PLACEHOLDER = "YOUR-RAILWAY";
+
+/** Shown on Contact and Meals when API_BASE is unset or still the placeholder (Firebase has no /api — requests must go to Railway). */
+export function missingApiBaseUserMessage() {
+  return "Set API_BASE in public/js/api-config.js to your Railway HTTPS URL, then redeploy hosting (e.g. firebase deploy --only hosting).";
+}
 
 export function apiBase() {
+  if (
+    typeof CONFIG_BASE === "string" &&
+    CONFIG_BASE &&
+    !CONFIG_BASE.includes(PLACEHOLDER)
+  ) {
+    return CONFIG_BASE.replace(/\/$/, "");
+  }
   const meta = document.querySelector('meta[name="api-base"]');
-  if (meta && meta.getAttribute("content")) {
-    const v = meta.getAttribute("content").trim();
-    if (v) {
-      return v.replace(/\/$/, "");
+  if (meta) {
+    const v = meta.getAttribute("content");
+    if (v && !v.includes(PLACEHOLDER)) {
+      return v.trim().replace(/\/$/, "");
     }
   }
   return "";
 }
+
+const AUTH_TOKEN_KEY = "portfolio_jwt";
 
 export function getAuthToken() {
   try {

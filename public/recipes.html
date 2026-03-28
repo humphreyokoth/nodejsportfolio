@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Railway API URL (no trailing slash). Required when this site is on Firebase/GitHub Pages. -->
-    <meta name="api-base" content="https://YOUR-APP.up.railway.app">
+    <!-- API base is set in /js/api-config.js (Railway URL). Meta is optional fallback. -->
     <title>Meals | Humphrey Okoth</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
@@ -29,8 +28,8 @@
     <main>
         <section class="page-header">
             <div class="container">
-                <h1>Meals dashboard</h1>
-                <p>Sign in to record meals, attach images, edit entries, and export an Excel report.</p>
+                <h1>Meals</h1>
+                <p>Sign in or create an account to manage your meal list.</p>
             </div>
         </section>
 
@@ -38,20 +37,44 @@
             <div class="container" style="max-width: 960px;">
                 <!-- If static site is on another host, set API origin (see contact.html). -->
                 <div class="card" id="recipeAuthPanel" style="padding: 18px;">
-                    <h2 style="margin-top:0;">Sign in</h2>
-                    <p style="margin-top:0; opacity:.9;">Log in to manage your meal log (MySQL on Aiven or another host). Uploaded images are stored on the app server unless you use an image link instead.</p>
-                    <form id="recipeLoginForm" class="contact-form" style="max-width: 420px;">
-                        <div class="form-group">
-                            <label for="recipeLoginUsername">Username</label>
-                            <input type="text" id="recipeLoginUsername" name="username" autocomplete="username" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="recipeLoginPassword">Password</label>
-                            <input type="password" id="recipeLoginPassword" name="password" autocomplete="current-password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary" id="recipeLoginSubmit">Sign in</button>
-                        <p class="form-status" id="recipeLoginStatus" aria-live="polite" style="margin-top:12px;"></p>
-                    </form>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px;">
+                        <button type="button" class="btn btn-primary" id="recipeTabLogin" aria-pressed="true">Sign in</button>
+                        <button type="button" class="btn btn-outline" id="recipeTabSignup" aria-pressed="false">Create account</button>
+                    </div>
+                    <div id="recipeLoginSection">
+                        <h2 style="margin-top:0;">Sign in</h2>
+                        <form id="recipeLoginForm" class="contact-form" style="max-width: 420px;">
+                            <div class="form-group">
+                                <label for="recipeLoginUsername">Username</label>
+                                <input type="text" id="recipeLoginUsername" name="username" autocomplete="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="recipeLoginPassword">Password</label>
+                                <input type="password" id="recipeLoginPassword" name="password" autocomplete="current-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="recipeLoginSubmit">Sign in</button>
+                            <p class="form-status" id="recipeLoginStatus" aria-live="polite" style="margin-top:12px;"></p>
+                        </form>
+                    </div>
+                    <div id="recipeSignupSection" hidden>
+                        <h2 style="margin-top:0;">Create account</h2>
+                        <form id="recipeSignupForm" class="contact-form" style="max-width: 420px;">
+                            <div class="form-group">
+                                <label for="recipeSignupUsername">Username</label>
+                                <input type="text" id="recipeSignupUsername" name="username" autocomplete="username" minlength="2" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="recipeSignupPassword">Password (min 8 characters)</label>
+                                <input type="password" id="recipeSignupPassword" name="password" autocomplete="new-password" minlength="8" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="recipeSignupPassword2">Confirm password</label>
+                                <input type="password" id="recipeSignupPassword2" name="password2" autocomplete="new-password" minlength="8" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="recipeSignupSubmit">Create account</button>
+                            <p class="form-status" id="recipeSignupStatus" aria-live="polite" style="margin-top:12px;"></p>
+                        </form>
+                    </div>
                 </div>
 
                 <div id="recipePlannerPanel" hidden>

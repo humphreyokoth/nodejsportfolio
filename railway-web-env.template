@@ -1,0 +1,8 @@
+# Railway → Web service (Node) Variables
+#
+# PORT=7000 — use 7000 here and in Settings → Networking (public URL) so they match.
+#
+# Reference MySQL plugin: MYSQL_URL (or MYSQLHOST, MYSQLPORT, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE).
+# Required: JWT_SECRET, ALLOWED_ORIGINS (your Firebase site URLs, comma-separated).
+# First admin when users table is empty: INITIAL_ADMIN_USER, INITIAL_ADMIN_PASS (remove pass after login).
+# Optional: AUTH_ALLOW_REGISTER=true, SMTP_* + CONTACT_NOTIFY_EMAIL, SKIP_DB_MIGRATIONS=true

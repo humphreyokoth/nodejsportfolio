@@ -1,4 +1,4 @@
-import { apiFetch } from "./api-base.js";
+import { apiFetch, apiBase, missingApiBaseUserMessage } from "./api-base.js";
 
 const form = document.getElementById("contactForm");
 const btn = document.getElementById("contactSubmit");
@@ -10,9 +10,22 @@ function setStatus(message, isError) {
   statusEl.style.color = isError ? "#b42318" : "#067647";
 }
 
+function missingApiMessage() {
+  return "Set your Railway API URL in public/js/api-config.js (replace YOUR-RAILWAY), then redeploy. Otherwise requests hit this site and return 404.";
+}
+
+if (!apiBase() && statusEl) {
+  setStatus(missingApiMessage(), true);
+}
+
 if (form && btn) {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    if (!apiBase()) {
+      setStatus(missingApiBaseUserMessage(), true);
+      return;
+    }
 
     const name = (form.querySelector("#name")?.value || "").trim();
     const email = (form.querySelector("#email")?.value || "").trim();
