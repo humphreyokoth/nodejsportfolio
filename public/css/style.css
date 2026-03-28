@@ -182,6 +182,20 @@ a { color: inherit; text-decoration: none; }
     border-color: #fff;
 }
 
+/* Outline button variant on light surfaces (cards/forms) */
+.card .btn-outline,
+.contact-form .btn-outline {
+    color: var(--primary);
+    border-color: rgba(108,92,231,0.55);
+}
+
+.card .btn-outline:hover,
+.contact-form .btn-outline:hover {
+    background: rgba(108,92,231,0.08);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
 .btn-full { width: 100%; }
 
 /* ---------- Section Titles ---------- */

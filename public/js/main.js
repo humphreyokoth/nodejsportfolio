@@ -36,17 +36,4 @@ if (navLinks) {
     });
 }
 
-// Contact form feedback
-var form = document.getElementById('contactForm');
-
-if (form) {
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var btn = form.querySelector('button[type="submit"]');
-        btn.textContent = 'Sent!';
-        form.reset();
-        setTimeout(function () {
-            btn.textContent = 'Send Message';
-        }, 2000);
-    });
-}
+// Contact form submission is handled in /js/contact.js

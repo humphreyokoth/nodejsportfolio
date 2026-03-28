@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meals | Humphrey Okoth</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="logo">Humphrey Okoth</a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/recipes" class="active">Meals</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <section class="page-header">
+            <div class="container">
+                <h1>Meals dashboard</h1>
+                <p>Sign in to record meals, attach images, edit entries, and export an Excel report.</p>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container" style="max-width: 960px;">
+                <!-- If static site is on another host, set API origin (see contact.html). -->
+                <div class="card" id="recipeAuthPanel" style="padding: 18px;">
+                    <h2 style="margin-top:0;">Sign in</h2>
+                    <p style="margin-top:0; opacity:.9;">Log in to manage your meal log (MySQL on Aiven or another host). Uploaded images are stored on the app server unless you use an image link instead.</p>
+                    <form id="recipeLoginForm" class="contact-form" style="max-width: 420px;">
+                        <div class="form-group">
+                            <label for="recipeLoginUsername">Username</label>
+                            <input type="text" id="recipeLoginUsername" name="username" autocomplete="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recipeLoginPassword">Password</label>
+                            <input type="password" id="recipeLoginPassword" name="password" autocomplete="current-password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="recipeLoginSubmit">Sign in</button>
+                        <p class="form-status" id="recipeLoginStatus" aria-live="polite" style="margin-top:12px;"></p>
+                    </form>
+                </div>
+
+                <div id="recipePlannerPanel" hidden>
+                <div class="card" style="padding: 14px 18px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:16px;">
+                    <span id="recipeAuthGreeting" style="opacity:.9; font-size:14px;"></span>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn btn-outline" id="recipeExportXlsx">Download Excel report</button>
+                        <button type="button" class="btn btn-outline" id="recipeLogoutBtn">Sign out</button>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 18px;">
+                    <h2 style="margin-top:0;">Add or edit a meal</h2>
+                    <form id="recipeForm" class="contact-form" style="max-width: 720px;">
+                        <div class="form-group">
+                            <label for="mealType">Meal</label>
+                            <select id="mealType" name="mealType" required style="width:100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(0,0,0,.12);">
+                                <option value="breakfast">Breakfast</option>
+                                <option value="lunch">Lunch</option>
+                                <option value="dinner">Dinner</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="title">Food</label>
+                            <input type="text" id="title" name="title" placeholder="e.g., Oatmeal + banana" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Notes (optional)</label>
+                            <textarea id="notes" name="notes" rows="3" placeholder="Short notes, ingredients, or why it's good..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recipeImage">Photo (optional, max 5MB)</label>
+                            <input type="file" id="recipeImage" name="image" accept="image/jpeg,image/png,image/gif,image/webp">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="recipeImageUrl">Or image link (optional)</label>
+                            <input type="url" id="recipeImageUrl" name="imageUrl" placeholder="https://example.com/photo.jpg">
+                        </div>
+
+                        <div class="form-group" id="recipeClearImageWrap" hidden>
+                            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                                <input type="checkbox" id="recipeClearImage" name="clearImage" value="1">
+                                Remove current image
+                            </label>
+                        </div>
+
+                        <div id="recipeImagePreview" style="margin-bottom:12px; display:none;">
+                            <span style="font-size:13px; opacity:.85;">Preview</span><br>
+                            <img id="recipeImagePreviewImg" alt="" style="max-width:100%; max-height:220px; border-radius:10px; margin-top:6px; object-fit:cover;">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="recipeSubmit">Add</button>
+                        <p class="form-status" id="recipeStatus" aria-live="polite" style="margin-top:12px;"></p>
+                    </form>
+                </div>
+
+                <div style="height:20px;"></div>
+
+                <div class="card" style="padding: 18px;">
+                    <h2 style="margin-top:0;">Your meals</h2>
+
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 16px;">
+                        <button class="btn btn-outline" type="button" data-filter="all">All</button>
+                        <button class="btn btn-outline" type="button" data-filter="breakfast">Breakfast</button>
+                        <button class="btn btn-outline" type="button" data-filter="lunch">Lunch</button>
+                        <button class="btn btn-outline" type="button" data-filter="dinner">Dinner</button>
+                    </div>
+
+                    <div id="recipesList"></div>
+                </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>humphrey okoth &copy; 2026. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script type="module" src="/js/recipes.js"></script>
+</body>
+</html>
+

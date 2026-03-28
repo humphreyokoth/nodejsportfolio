@@ -1,0 +1,17 @@
+# Railway: add a MySQL database, then add a Web Service from this repo.
+#
+# On the WEB service → Variables:
+#   - "Reference" each variable from the MySQL service (MYSQLHOST should be mysql.railway.internal, port 3306).
+#   - Or reference MYSQL_URL only — the app parses mysql:// URLs too.
+#   - Add JWT_SECRET (required), AUTH_BOOTSTRAP_USERNAME/PASSWORD (first login), SMTP_* + CONTACT_NOTIFY_EMAIL (optional).
+# Migrations run automatically on `npm start`. Use public proxy host only for local .env, not on Railway.
+#
+# Volume (optional): mount at public/uploads/recipes for persistent recipe photos.
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 120
