@@ -58,7 +58,7 @@ export function apiUrl(path) {
 }
 
 export async function apiFetch(path, options = {}) {
-  const { headers: optHeaders, ...rest } = options;
+  const { headers: optHeaders, signal: userSignal, timeoutMs, ...rest } = options;
   const headers = { ...optHeaders };
   const isForm =
     typeof FormData !== "undefined" && rest.body && rest.body instanceof FormData;
@@ -74,5 +74,16 @@ export async function apiFetch(path, options = {}) {
   }
 
   const fetchOpts = { credentials: "include", ...rest, headers };
+  const ms = Number(timeoutMs ?? 25000);
+  if (ms > 0 && typeof AbortSignal !== "undefined" && AbortSignal.timeout) {
+    const t = AbortSignal.timeout(ms);
+    if (userSignal && typeof AbortSignal.any === "function") {
+      fetchOpts.signal = AbortSignal.any([userSignal, t]);
+    } else {
+      fetchOpts.signal = t;
+    }
+  } else if (userSignal) {
+    fetchOpts.signal = userSignal;
+  }
   return fetch(apiUrl(path), fetchOpts);
 }

@@ -252,16 +252,32 @@ if (signupForm && signupBtn) {
         if (signupStatusEl) {
           signupStatusEl.textContent =
             typeof data.error === "string" ? data.error : "Could not create account.";
+          signupStatusEl.style.color = "#b42318";
         }
-        return;
+      } else {
+        if (typeof data.token === "string" && data.token) {
+          setAuthToken(data.token);
+        }
+        if (signupPass) signupPass.value = "";
+        if (signupPass2) signupPass2.value = "";
+        showLoggedIn(data.user?.username || username);
+        try {
+          await loadRecipes();
+        } catch (loadErr) {
+          console.error(loadErr);
+          setStatus("Signed in but could not load meals. Refresh the page.", true);
+        }
       }
-      if (typeof data.token === "string" && data.token) {
-        setAuthToken(data.token);
+    } catch (err) {
+      console.error(err);
+      if (signupStatusEl) {
+        const msg =
+          err && (err.name === "TimeoutError" || err.name === "AbortError")
+            ? "Request timed out. Try again."
+            : "Network error — open DevTools → Network, or confirm Railway API and CORS.";
+        signupStatusEl.textContent = msg;
+        signupStatusEl.style.color = "#b42318";
       }
-      if (signupPass) signupPass.value = "";
-      if (signupPass2) signupPass2.value = "";
-      showLoggedIn(data.user?.username || username);
-      await loadRecipes();
     } finally {
       signupBtn.disabled = false;
       signupBtn.textContent = prev || "Create account";
@@ -292,15 +308,31 @@ if (loginForm && loginBtn) {
         if (loginStatusEl) {
           loginStatusEl.textContent =
             typeof data.error === "string" ? data.error : "Login failed.";
+          loginStatusEl.style.color = "#b42318";
         }
-        return;
+      } else {
+        if (typeof data.token === "string" && data.token) {
+          setAuthToken(data.token);
+        }
+        if (loginPass) loginPass.value = "";
+        showLoggedIn(data.user?.username || username);
+        try {
+          await loadRecipes();
+        } catch (loadErr) {
+          console.error(loadErr);
+          setStatus("Signed in but could not load meals. Refresh the page.", true);
+        }
       }
-      if (typeof data.token === "string" && data.token) {
-        setAuthToken(data.token);
+    } catch (err) {
+      console.error(err);
+      if (loginStatusEl) {
+        const msg =
+          err && (err.name === "TimeoutError" || err.name === "AbortError")
+            ? "Request timed out. Try again."
+            : "Network error — confirm API URL and CORS on Railway.";
+        loginStatusEl.textContent = msg;
+        loginStatusEl.style.color = "#b42318";
       }
-      if (loginPass) loginPass.value = "";
-      showLoggedIn(data.user?.username || username);
-      await loadRecipes();
     } finally {
       loginBtn.disabled = false;
       loginBtn.textContent = prev || "Sign in";

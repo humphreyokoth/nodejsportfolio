@@ -68,7 +68,11 @@ if (form && btn) {
     } catch (err) {
       console.error(err);
       btn.textContent = prevText || "Send Message";
-      setStatus("Failed to send. Please try again.", true);
+      const net =
+        err && (err.name === "TimeoutError" || err.name === "AbortError")
+          ? "Request timed out. Check Railway API and your connection."
+          : "Network error — confirm the API URL and CORS on Railway.";
+      setStatus(net, true);
     } finally {
       btn.disabled = false;
     }

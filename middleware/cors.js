@@ -1,11 +1,11 @@
 const allowed = (process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || "")
   .split(",")
-  .map((s) => s.trim())
+  .map((s) => s.trim().replace(/\/+$/, ""))
   .filter(Boolean);
 
 function corsMiddleware(req, res, next) {
   if (allowed.length) {
-    const origin = req.headers.origin;
+    const origin = (req.headers.origin || "").replace(/\/+$/, "");
     if (origin && allowed.includes(origin)) {
       res.setHeader("Access-Control-Allow-Origin", origin);
       res.setHeader("Vary", "Origin");
