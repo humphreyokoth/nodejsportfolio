@@ -26,8 +26,9 @@ jobs:
       - name: Build static site
         run: |
           mkdir -p deploy
-          cp views/*.html deploy/
-          cp -r public/css public/js public/images deploy/
+          cp public/*.html deploy/
+          cp -r public/css public/js deploy/
+          if [ -d public/images ]; then cp -r public/images deploy/; fi
           touch deploy/.nojekyll
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           if [[ "$REPO_NAME" == *.github.io ]]; then BASE_HREF="/"; else BASE_HREF="/${REPO_NAME}/"; fi
