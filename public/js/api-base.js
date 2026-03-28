@@ -1,28 +1,31 @@
-import { API_BASE as CONFIG_BASE } from "./api-config.js";
+import { API_BASE as CONFIG_BASE } from "./api-config.js?v=3";
 
 const PLACEHOLDER = "YOUR-RAILWAY";
 
-/** Shown on Contact and Meals when API_BASE is unset or still the placeholder (Firebase has no /api — requests must go to Railway). */
+/** Shown when no API base is resolved (Firebase has no /api — use Railway URL). */
 export function missingApiBaseUserMessage() {
-  return "Set API_BASE in public/js/api-config.js to your Railway HTTPS URL, then redeploy hosting (e.g. firebase deploy --only hosting).";
+  return "API URL missing. Hard-refresh (Ctrl+Shift+R). If it persists, redeploy Firebase hosting.";
+}
+
+function normalizeBase(v) {
+  if (typeof v !== "string" || !v) return "";
+  const s = v.trim().replace(/\/$/, "");
+  if (!s || s.includes(PLACEHOLDER)) return "";
+  return s;
 }
 
 export function apiBase() {
-  if (
-    typeof CONFIG_BASE === "string" &&
-    CONFIG_BASE &&
-    !CONFIG_BASE.includes(PLACEHOLDER)
-  ) {
-    return CONFIG_BASE.replace(/\/$/, "");
+  if (typeof window !== "undefined" && window.__PORTFOLIO_API_BASE__) {
+    const b = normalizeBase(String(window.__PORTFOLIO_API_BASE__));
+    if (b) return b;
   }
   const meta = document.querySelector('meta[name="api-base"]');
   if (meta) {
-    const v = meta.getAttribute("content");
-    if (v && !v.includes(PLACEHOLDER)) {
-      return v.trim().replace(/\/$/, "");
-    }
+    const b = normalizeBase(meta.getAttribute("content") || "");
+    if (b) return b;
   }
-  return "";
+  const b = normalizeBase(typeof CONFIG_BASE === "string" ? CONFIG_BASE : "");
+  return b;
 }
 
 const AUTH_TOKEN_KEY = "portfolio_jwt";

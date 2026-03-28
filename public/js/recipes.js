@@ -4,7 +4,7 @@ import {
   setAuthToken,
   clearAuthToken,
   missingApiBaseUserMessage,
-} from "./api-base.js";
+} from "./api-base.js?v=3";
 
 const form = document.getElementById("recipeForm");
 const submitBtn = document.getElementById("recipeSubmit");
@@ -267,6 +267,10 @@ if (signupForm && signupBtn) {
           console.error(loadErr);
           setStatus("Signed in but could not load meals. Refresh the page.", true);
         }
+        const plannerEl = document.getElementById("recipePlannerPanel");
+        if (plannerEl) {
+          plannerEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
       }
     } catch (err) {
       console.error(err);
@@ -321,6 +325,10 @@ if (loginForm && loginBtn) {
         } catch (loadErr) {
           console.error(loadErr);
           setStatus("Signed in but could not load meals. Refresh the page.", true);
+        }
+        const plannerEl2 = document.getElementById("recipePlannerPanel");
+        if (plannerEl2) {
+          plannerEl2.scrollIntoView({ behavior: "smooth", block: "start" });
         }
       }
     } catch (err) {

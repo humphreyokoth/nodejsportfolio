@@ -12,6 +12,12 @@
       { "source": "/contact", "destination": "/contact.html" }
       ,
       { "source": "/recipes", "destination": "/recipes.html" }
+    ],
+    "headers": [
+      {
+        "source": "/js/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }]
+      }
     ]
   },
   "firestore": {
