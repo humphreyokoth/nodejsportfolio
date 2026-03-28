@@ -1,4 +1,4 @@
-import { apiFetch, apiBase } from "./api-base.js";
+import { apiFetch, apiBase, setAuthToken, clearAuthToken } from "./api-base.js";
 
 const form = document.getElementById("recipeForm");
 const submitBtn = document.getElementById("recipeSubmit");
@@ -154,6 +154,7 @@ async function loadRecipes() {
 }
 
 function showLoggedOut() {
+  clearAuthToken();
   if (authPanel) authPanel.hidden = false;
   if (plannerPanel) plannerPanel.hidden = true;
   if (authGreeting) authGreeting.textContent = "";
@@ -209,6 +210,9 @@ if (loginForm && loginBtn) {
             typeof data.error === "string" ? data.error : "Login failed.";
         }
         return;
+      }
+      if (typeof data.token === "string" && data.token) {
+        setAuthToken(data.token);
       }
       if (loginPass) loginPass.value = "";
       showLoggedIn(data.user?.username || username);

@@ -136,7 +136,11 @@ function cookieOptions() {
 }
 
 function readAuth(req) {
-  const token = req.cookies[COOKIE_NAME];
+  const fromCookie = req.cookies[COOKIE_NAME];
+  const authHeader = req.headers.authorization;
+  const fromBearer =
+    authHeader && authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+  const token = fromCookie || fromBearer;
   if (!token) return null;
   try {
     const p = jwt.verify(token, JWT_SECRET);
@@ -159,16 +163,25 @@ app.use(express.json({ limit: "128kb" }));
 app.use(express.urlencoded({ extended: true, limit: "128kb" }));
 app.use(cookieParser());
 
-const allowedOrigin = process.env.ALLOWED_ORIGIN;
+const allowedOriginsList = (process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 
-app.use((req, res, next) => {
-  if (allowedOrigin) {
-    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+function applyCors(req, res) {
+  if (allowedOriginsList.length === 0) return;
+  const origin = req.headers.origin;
+  if (origin && allowedOriginsList.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   }
+}
+
+app.use((req, res, next) => {
+  applyCors(req, res);
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }
@@ -212,7 +225,7 @@ app.post("/api/auth/login", async (req, res) => {
       expiresIn: "7d",
     });
     res.cookie(COOKIE_NAME, token, cookieOptions());
-    res.json({ ok: true, user: { username: row.username } });
+    res.json({ ok: true, user: { username: row.username }, token });
   } catch (e) {
     console.error("login error:", e.message);
     res.status(500).json({ error: "Login failed." });

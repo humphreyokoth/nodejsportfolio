@@ -1,9 +1,38 @@
+const AUTH_TOKEN_KEY = "portfolio_jwt";
+
 export function apiBase() {
   const meta = document.querySelector('meta[name="api-base"]');
   if (meta && meta.getAttribute("content")) {
-    return meta.getAttribute("content").replace(/\/$/, "");
+    const v = meta.getAttribute("content").trim();
+    if (v) {
+      return v.replace(/\/$/, "");
+    }
   }
   return "";
+}
+
+export function getAuthToken() {
+  try {
+    return sessionStorage.getItem(AUTH_TOKEN_KEY);
+  } catch {
+    return null;
+  }
+}
+
+export function setAuthToken(token) {
+  try {
+    if (token) {
+      sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+    } else {
+      sessionStorage.removeItem(AUTH_TOKEN_KEY);
+    }
+  } catch {
+    /* ignore */
+  }
+}
+
+export function clearAuthToken() {
+  setAuthToken(null);
 }
 
 export function apiUrl(path) {
@@ -22,9 +51,12 @@ export async function apiFetch(path, options = {}) {
   } else if (rest.body && typeof rest.body === "string" && !headers["Content-Type"]) {
     headers["Content-Type"] = "application/json";
   }
-  const fetchOpts = { credentials: "include", ...rest };
-  if (Object.keys(headers).length > 0) {
-    fetchOpts.headers = headers;
+
+  const token = getAuthToken();
+  if (token && !headers.Authorization) {
+    headers.Authorization = `Bearer ${token}`;
   }
+
+  const fetchOpts = { credentials: "include", ...rest, headers };
   return fetch(apiUrl(path), fetchOpts);
 }
