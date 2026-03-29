@@ -1,5 +1,6 @@
 const { getPool } = require("../db/pool");
-const { notifyContactForm } = require("../lib/mail");
+const { notifyContactForm, sendTestEmail } = require("../lib/mail");
+const { requireAuth } = require("../middleware/auth");
 const {
   MAX_NAME,
   MAX_EMAIL,
@@ -9,6 +10,11 @@ const {
 } = require("../lib/constants");
 
 function mountContactRoutes(app) {
+  // Auth-protected test endpoint — only you can call it
+  app.post("/api/email-test", requireAuth, async function (req, res) {
+    const result = await sendTestEmail();
+    res.status(result.ok ? 200 : 500).json(result);
+  });
   app.post("/api/contact", async function (req, res) {
     const db = getPool();
     if (!db) {
@@ -40,11 +46,11 @@ function mountContactRoutes(app) {
         [name, email, message, userAgent, pagePath]
       );
 
-      notifyContactForm({ name: name, email: email, message: message, pagePath: pagePath }).catch(
-        function (mailErr) {
-          console.error("contact mail:", mailErr.message);
-        }
-      );
+      notifyContactForm({ name: name, email: email, message: message, pagePath: pagePath })
+        .then(() => console.log("contact mail: sent to", process.env.CONTACT_NOTIFY_EMAIL))
+        .catch(function (mailErr) {
+          console.error("contact mail ERROR:", mailErr.message);
+        });
 
       res.status(201).json({ ok: true });
     } catch (err) {
