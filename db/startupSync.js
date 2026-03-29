@@ -15,8 +15,8 @@ async function seedFirstAdminIfEmpty() {
   const db = getPool();
   if (!db) return;
 
-  const username = process.env.INITIAL_ADMIN_USER || process.env.AUTH_BOOTSTRAP_USERNAME;
-  const password = process.env.INITIAL_ADMIN_PASS || process.env.AUTH_BOOTSTRAP_PASSWORD;
+  const username = process.env.INITIAL_ADMIN_USER;
+  const password = process.env.INITIAL_ADMIN_PASS;
   if (!username || !password) return;
 
   try {

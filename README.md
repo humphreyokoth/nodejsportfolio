@@ -1,4 +1,17 @@
-# Portfolio (Node + MySQL + Firebase Hosting)
+# Humphrey Okoth — Personal Portfolio & Meal Tracker
+
+## Live URLs
+
+| Layer | URL |
+|-------|-----|
+| **Frontend** (Firebase Hosting) | https://okothhumphrey.web.app |
+| **Backend API** (Railway) | https://nodejsportfolio-production.up.railway.app |
+| **API Health Check** | https://nodejsportfolio-production.up.railway.app/api/health |
+| **Dashboard** | https://okothhumphrey.web.app/dashboard |
+
+Technical documentation (short; copy into Word or open with Word): **[docs/PORTFOLIO-DOC.md](docs/PORTFOLIO-DOC.md)**.
+
+---
 
 **Pieces:** Node API in this repo (`server.js`, `routes/`, `db/`). Static site in `public/`. API URL is set in `public/js/api-config.js` as `API_BASE`.
 
@@ -41,6 +54,9 @@ End-to-end: Railway serves `/api/*`; Firebase only serves static files. **Contac
 |--------|----------------|
 | `npm start` | Run the API locally |
 | `npm run migrate` | Run SQL migrations once (`db/migrate-cli.js`) |
-| `npx firebase deploy --only hosting` | Upload `public/` to Firebase Hosting |
+| `npx firebase deploy --only hosting` | Deploy **frontend** (`public/`) to Firebase Hosting |
+| *Git push to `main`* | Typical **Railway** deploy for the **Node API** (if GitHub integration is enabled) |
 
-First admin: use **`INITIAL_ADMIN_USER`** / **`INITIAL_ADMIN_PASS`**. Older names **`AUTH_BOOTSTRAP_USERNAME`** / **`AUTH_BOOTSTRAP_PASSWORD`** still work as aliases.
+**MySQL schema:** **`db/migrations/*.sql`**. **Firestore:** console or `gcloud firestore export` — see **[docs/PORTFOLIO-DOC.md](docs/PORTFOLIO-DOC.md)**.
+
+First admin seed (empty `users` table): set **`INITIAL_ADMIN_USER`** and **`INITIAL_ADMIN_PASS`** in the environment, then remove the password from env after first login.
