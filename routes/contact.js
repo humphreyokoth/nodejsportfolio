@@ -1,5 +1,6 @@
 const { getPool } = require("../db/pool");
 const { notifyContactForm, sendTestEmail } = require("../lib/mail");
+// Email uses Resend (HTTPS) — Railway blocks SMTP ports 587/465
 const { requireAuth } = require("../middleware/auth");
 const {
   MAX_NAME,
