@@ -13,12 +13,12 @@ function mountMessageRoutes(app) {
     try {
       const [[countRow]] = await db.execute("SELECT COUNT(*) AS total FROM contact_messages");
       const total = Number(countRow.total);
-      const [rows] = await db.execute(
+      // LIMIT/OFFSET must be inlined as integers — MySQL 8 rejects them as prepared-statement params
+      const [rows] = await db.query(
         `SELECT id, name, email, message, page_path, created_at
          FROM contact_messages
          ORDER BY created_at DESC
-         LIMIT ? OFFSET ?`,
-        [limit, offset]
+         LIMIT ${limit} OFFSET ${offset}`
       );
       res.json({
         messages: rows,
