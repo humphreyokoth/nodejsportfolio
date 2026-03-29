@@ -5,6 +5,7 @@ const { corsMiddleware } = require("./middleware/cors");
 const { mountAuthRoutes } = require("./routes/auth");
 const { mountRecipeRoutes } = require("./routes/recipes");
 const { mountContactRoutes } = require("./routes/contact");
+const { mountMessageRoutes } = require("./routes/messages");
 const { mountPageRoutes } = require("./routes/pages");
 const { syncDatabase, isDeferMigrations } = require("./db/startupSync");
 
@@ -19,6 +20,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true }));
 mountAuthRoutes(app);
 mountRecipeRoutes(app);
 mountContactRoutes(app);
+mountMessageRoutes(app);
 mountPageRoutes(app);
 
 async function start() {

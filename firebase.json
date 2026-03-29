@@ -9,9 +9,9 @@
     "cleanUrls": true,
     "rewrites": [
       { "source": "/about", "destination": "/about.html" },
-      { "source": "/contact", "destination": "/contact.html" }
-      ,
-      { "source": "/recipes", "destination": "/recipes.html" }
+      { "source": "/contact", "destination": "/contact.html" },
+      { "source": "/recipes", "destination": "/recipes.html" },
+      { "source": "/dashboard", "destination": "/dashboard.html" }
     ],
     "headers": [
       {
@@ -19,11 +19,5 @@
         "headers": [{ "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }]
       }
     ]
-  },
-  "firestore": {
-    "database": "(default)",
-    "location": "africa-south1",
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
   }
 }

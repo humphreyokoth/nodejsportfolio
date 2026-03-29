@@ -8,6 +8,7 @@ function mountPageRoutes(app) {
   app.get("/about", html("about.html"));
   app.get("/contact", html("contact.html"));
   app.get("/recipes", html("recipes.html"));
+  app.get("/dashboard", html("dashboard.html"));
   app.use(express.static(publicDir));
   app.get("*", (req, res) => {
     if (req.path.startsWith("/api/")) return res.status(404).json({ error: "Not found" });

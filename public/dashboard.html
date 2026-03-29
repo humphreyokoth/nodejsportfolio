@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>window.__PORTFOLIO_API_BASE__="https://nodejsportfolio-production.up.railway.app";</script>
+    <meta name="api-base" content="https://nodejsportfolio-production.up.railway.app">
+    <title>Dashboard | Humphrey Okoth</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* ---- Dashboard-specific styles ---- */
+        .dash-header {
+            background: var(--dark);
+            color: #fff;
+            padding: 32px 0 28px;
+        }
+        .dash-header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .dash-title { font-size: 1.5rem; font-weight: 700; }
+        .dash-subtitle { opacity: .7; font-size: .9rem; margin-top: 2px; }
+
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin: 28px 0 24px;
+        }
+        .stat-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 18px 24px;
+            min-width: 140px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.07);
+            text-align: center;
+        }
+        .stat-num {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        /* Message cards */
+        .msg-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.07);
+            border-left: 4px solid var(--primary);
+            transition: box-shadow .2s;
+        }
+        .msg-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.1); }
+
+        .msg-meta {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .msg-sender { font-weight: 700; font-size: 1rem; }
+        .msg-email {
+            font-size: .85rem;
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        .msg-date {
+            font-size: .78rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+        .msg-page {
+            font-size: .75rem;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+        .msg-body {
+            font-size: .93rem;
+            line-height: 1.65;
+            color: var(--text);
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: var(--bg);
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin-top: 10px;
+        }
+        .msg-actions { margin-top: 12px; display: flex; gap: 8px; }
+
+        /* Reply button */
+        .btn-reply {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 7px 18px;
+            border-radius: 6px;
+            font-size: .85rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-reply:hover { opacity: .88; }
+
+        /* Delete button */
+        .btn-delete {
+            background: transparent;
+            color: #b42318;
+            border: 1.5px solid #b42318;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: .85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-delete:hover { background: #b42318; color: #fff; }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 28px 0;
+            flex-wrap: wrap;
+        }
+        .page-btn {
+            padding: 7px 16px;
+            border-radius: 6px;
+            border: 1.5px solid var(--primary);
+            color: var(--primary);
+            background: transparent;
+            font-size: .88rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .page-btn.active, .page-btn:hover { background: var(--primary); color: #fff; }
+        .page-btn:disabled { opacity: .4; cursor: default; }
+
+        /* Auth wall */
+        .auth-wall {
+            text-align: center;
+            padding: 80px 24px;
+        }
+        .auth-wall h2 { font-size: 1.6rem; margin-bottom: 12px; }
+        .auth-wall p { color: var(--muted); margin-bottom: 24px; }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 24px;
+            color: var(--muted);
+        }
+        .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+
+        /* Loading */
+        .loading-row { text-align: center; padding: 40px; color: var(--muted); }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="logo">Humphrey Okoth</a>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/recipes">Meals</a></li>
+                <li><a href="/dashboard" class="active">Dashboard</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Auth wall (shown until verified) -->
+        <div id="authWall" style="display:none;">
+            <div class="auth-wall">
+                <h2>Sign in required</h2>
+                <p>You must be signed in to view the dashboard.</p>
+                <a href="/recipes" class="btn btn-primary" style="background:var(--primary);color:#fff;border-color:var(--primary);">Go to Sign In</a>
+            </div>
+        </div>
+
+        <!-- Dashboard content (hidden until auth confirmed) -->
+        <div id="dashContent" style="display:none;">
+            <div class="dash-header">
+                <div class="container">
+                    <div class="dash-header-inner">
+                        <div>
+                            <div class="dash-title">Dashboard</div>
+                            <div class="dash-subtitle" id="dashGreeting">Welcome back</div>
+                        </div>
+                        <button class="btn-delete" id="dashLogoutBtn" style="border-color:rgba(255,255,255,.4);color:#fff;">Sign out</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container" style="padding-top:8px; padding-bottom:48px;">
+                <!-- Stats -->
+                <div class="stats-bar" id="statsBar">
+                    <div class="stat-card">
+                        <div class="stat-num" id="statTotal">—</div>
+                        <div class="stat-label">Total messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-num" id="statPage">1</div>
+                        <div class="stat-label">Current page</div>
+                    </div>
+                </div>
+
+                <!-- Messages -->
+                <div id="msgList">
+                    <div class="loading-row">Loading messages…</div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>humphrey okoth &copy; 2026. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script type="module" src="/js/dashboard.js?v=1"></script>
+</body>
+</html>
