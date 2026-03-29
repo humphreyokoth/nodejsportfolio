@@ -1,62 +1,81 @@
 # Humphrey Okoth — Personal Portfolio & Meal Tracker
 
+**Humphrey Okoth Personal Portfolio & Meal Tracker** — a personal portfolio website that showcases work, allows visitors to send contact messages, and includes a private meal/recipe tracker with an admin dashboard.
+
 ## Live URLs
 
-| Layer | URL |
-|-------|-----|
-| **Frontend** (Firebase Hosting) | https://okothhumphrey.web.app |
-| **Backend API** (Railway) | https://nodejsportfolio-production.up.railway.app |
-| **API Health Check** | https://nodejsportfolio-production.up.railway.app/api/health |
+| | URL |
+|---|---|
+| **Site** | https://okothhumphrey.web.app |
+| **Backend API** | https://nodejsportfolio-production.up.railway.app |
 | **Dashboard** | https://okothhumphrey.web.app/dashboard |
-
-Technical documentation (short; copy into Word or open with Word): **[docs/PORTFOLIO-DOC.md](docs/PORTFOLIO-DOC.md)**.
+| **Health check** | https://nodejsportfolio-production.up.railway.app/api/health |
 
 ---
 
-**Pieces:** Node API in this repo (`server.js`, `routes/`, `db/`). Static site in `public/`. API URL is set in `public/js/api-config.js` as `API_BASE`.
+## Architecture
+
+| Layer | Technology | Role |
+|-------|------------|------|
+| Frontend | Firebase Hosting | Serves `public/` (HTML, CSS, JS). |
+| Backend | Railway (Node / Express) | REST API under `/api/*`. |
+| Database | Railway (MySQL) | Users, recipes, contact messages. |
+| Email | Resend | Contact form notifications. |
+
+**Firestore:** This repo does **not** use Firestore. Any collections you see in the Firebase console are from an older setup — live data is in MySQL only.
+
+---
+
+## API
+
+**Public:** `GET /api/health` · `POST /api/auth/register` · `POST /api/auth/login` · `POST /api/auth/logout` · `POST /api/contact`
+
+**Authenticated** (Bearer JWT): `GET /api/auth/me` · `GET|POST|PATCH|DELETE /api/recipes` · `GET /api/recipes/export.xlsx` · `GET /api/messages` · `DELETE /api/messages/:id` · `POST /api/email-test`
+
+---
+
+## Database (MySQL)
+
+| Table | Contents |
+|-------|----------|
+| `users` | Username and password hash. |
+| `recipes` | Per-user meals — type, title, notes, optional image URL. |
+| `contact_messages` | Contact form submissions and metadata. |
+
+Schema defined in `db/migrations/*.sql` — migrations run automatically on server start.
+
+---
+
+## Requirements
+
+**Functional:** Health check · register/login/logout · recipe CRUD with image upload · Excel export · contact form with email · message dashboard · email test endpoint.
+
+**Non-functional:** CORS via `ALLOWED_ORIGINS` · JWT auth · Resend for email · field/upload size limits in code.
+
+---
+
+## Deploy
+
+**Frontend (Firebase):**
+```
+npx firebase deploy --only hosting
+```
+
+**Backend (Railway):** `git push` to `main` — Railway auto-deploys via GitHub integration.
 
 ---
 
 ## Run locally
 
-1. Copy env: use `.env` (see `railway-web-env.template` for names). Set at least MySQL (`MYSQL_*` or `MYSQL_PUBLIC_URL`), `JWT_SECRET`, and optional `INITIAL_ADMIN_USER` / `INITIAL_ADMIN_PASS`. Use **`PORT=7000`** (or omit `PORT` to default to **7000**).
+1. Set env vars (copy `.env`): `MYSQL_*`, `JWT_SECRET`, optional `INITIAL_ADMIN_USER` / `INITIAL_ADMIN_PASS`. Default port: `7000`.
 2. `npm install`
-3. `npm start` (or `npm run dev` with nodemon)
-4. Open **http://127.0.0.1:7000** (or your `PORT`). Health: **http://127.0.0.1:7000/api/health** → `{"ok":true}`.
-
-SQL migrations run when the server starts unless you set `SKIP_DB_MIGRATIONS=true`.
+3. `npm start`
+4. Health: http://127.0.0.1:7000/api/health
 
 ---
 
-## Railway (API + MySQL)
+## Environment variables
 
-1. Create a project, add the **MySQL** plugin, then add this repo as a **Web** service in the **same** project.
-2. In the **Web** service variables: connect MySQL (Railway fills `MYSQL_URL` / related vars), set `JWT_SECRET`, `ALLOWED_ORIGINS`, `INITIAL_ADMIN_USER`, `INITIAL_ADMIN_PASS`.
-3. **Do not** set `PORT` to **3306** — that is MySQL’s port. On the **Web** service set **`PORT=7000`** and point public networking at **7000** (same as local).
-4. After deploy, test: `https://<your-service>.up.railway.app/api/health` → `{"ok":true}`.
+`MYSQL_*` or `MYSQL_PUBLIC_URL`, `JWT_SECRET`, `ALLOWED_ORIGINS`, `RESEND_API_KEY`, `CONTACT_NOTIFY_EMAIL`, `PORT`, optional `INITIAL_ADMIN_USER` / `INITIAL_ADMIN_PASS`.
 
----
-
-## Firebase (host the `public/` site)
-
-End-to-end: Railway serves `/api/*`; Firebase only serves static files. **Contact** and **Meals** use `API_BASE` from `public/js/api-config.js` so the browser calls Railway directly.
-
-1. Deploy the API on Railway and confirm `https://<your-service>.up.railway.app/api/health` returns `{"ok":true}`.
-2. In `public/js/api-config.js`, set `API_BASE` to that same origin (no trailing slash). On the Web service, set `ALLOWED_ORIGINS` to include your Firebase site URL (e.g. `https://yourproject.web.app`).
-3. `npx firebase login`
-4. `npx firebase deploy --only hosting`
-
----
-
-## Commands
-
-| Command | What it does |
-|--------|----------------|
-| `npm start` | Run the API locally |
-| `npm run migrate` | Run SQL migrations once (`db/migrate-cli.js`) |
-| `npx firebase deploy --only hosting` | Deploy **frontend** (`public/`) to Firebase Hosting |
-| *Git push to `main`* | Typical **Railway** deploy for the **Node API** (if GitHub integration is enabled) |
-
-**MySQL schema:** **`db/migrations/*.sql`**. **Firestore:** console or `gcloud firestore export` — see **[docs/PORTFOLIO-DOC.md](docs/PORTFOLIO-DOC.md)**.
-
-First admin seed (empty `users` table): set **`INITIAL_ADMIN_USER`** and **`INITIAL_ADMIN_PASS`** in the environment, then remove the password from env after first login.
+First admin seed: set `INITIAL_ADMIN_USER` + `INITIAL_ADMIN_PASS`, then remove the password from env after first login.
